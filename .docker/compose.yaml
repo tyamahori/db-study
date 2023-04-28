@@ -1,0 +1,66 @@
+services:
+
+  postgresql:
+    image: postgres:15.2-bullseye
+    container_name: tyamahori-study-postgresql
+    ports:
+      - 127.0.0.1:5432:5432
+    environment:
+      TZ: Asia/Tokyo
+      POSTGRES_DB: tyamahori
+      POSTGRES_USER: tyamahori
+      POSTGRES_PASSWORD: tyamahori
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --locale=C"
+    volumes:
+      - type: volume
+        source: postgresql
+        target: /var/lib/postgresql/data
+    healthcheck:
+      test: [
+        "CMD",
+        "pg_isready",
+        "-U",
+        "tyamahori",
+        "-d",
+        "tyamahori"
+      ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mysql:
+    image: mysql:8.0.32
+    container_name: tyamahori-study-mysql
+    ports:
+      - 127.0.0.1:3306:3306
+    environment:
+      TZ: Asia/Tokyo
+      MYSQL_ROOT_PASSWORD: tyamahori
+      MYSQL_DATABASE: tyamahori
+      MYSQL_USER: tyamahori
+      MYSQL_PASSWORD: tyamahori
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-time-zone=+09:00
+    volumes:
+      - type: volume
+        source: mysql
+        target: /var/lib/mysql
+    healthcheck:
+      test: [
+        "CMD",
+        "mysqladmin",
+        "ping",
+        "-h",
+        "localhost",
+        "-u",
+        "tyamahori",
+        "-ptyamahori"
+      ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgresql:
+    name: tyamahori-study-postgresql
+  mysql:
+    name: tyamahori-study-mysql
